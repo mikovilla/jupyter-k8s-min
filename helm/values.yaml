@@ -1,0 +1,26 @@
+image:
+  repository: jupyter/minimal-notebook
+  tag: python-3.11
+  pullPolicy: IfNotPresent
+
+jupyter:
+  extraArgs: "--ip=0.0.0.0 --no-browser --NotebookApp.token="
+
+service:
+  type: ClusterIP
+  port: 8888
+  targetPort: 8888
+
+persistence:
+  enabled: true
+  storageClassName: "standard"
+  accessMode: "ReadWriteOnce"
+  size: 10Gi
+  mountPath: /home/jovyan/work
+  hostPath: /drive
+
+requirements: |
+  jupyterlab
+  numpy
+  pandas
+  matplotlib

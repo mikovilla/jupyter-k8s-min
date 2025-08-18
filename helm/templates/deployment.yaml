@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-app
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-app
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 100
+        fsGroup: 100
+        fsGroupChangePolicy: "OnRootMismatch"
+      containers:
+        - name: jupyter
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8888
+          args:            
+            - start-notebook.sh
+            {{- if .Values.jupyter.extraArgs }}
+            {{- range $a := (splitList " " .Values.jupyter.extraArgs) }}
+            - {{ $a | quote }}
+            {{- end }}
+            {{- end }}
+          env:
+            - name: PIP_DISABLE_PIP_VERSION_CHECK
+              value: "1"
+            - name: GRANT_SUDO
+              value: "yes"
+            - name: JUPYTER_ENV_VARS_TO_UNSET
+              value: ""
+            - name: JUPYTER_DOCKER_STACKS_QUIET
+              value: "true"
+          volumeMounts:
+            - name: reqs
+              mountPath: /opt/requirements
+              readOnly: true
+            - name: work
+              mountPath: /home/jovyan/work
+            - name: start-hooks
+              mountPath: /usr/local/bin/start-notebook.d
+              readOnly: true
+      volumes:
+        - name: reqs
+          configMap:
+            name: {{ .Release.Name }}-requirements
+            items:
+              - key: requirements.txt
+                path: requirements.txt
+        - name: start-hooks
+          configMap:
+            name: {{ .Release.Name }}-starthooks
+            defaultMode: 0755
+        - name: work
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-data

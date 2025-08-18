@@ -1,0 +1,6 @@
+apiVersion: v2
+name: jupyter-notebook
+description: Minimal Jupyter with requirements.txt via ConfigMap + lifecycle hook
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
