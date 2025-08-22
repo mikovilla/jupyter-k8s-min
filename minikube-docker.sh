@@ -4,6 +4,6 @@ minikube delete -p "$PROFILE" || true
 
 minikube start -p "$PROFILE" \
   --driver=docker \
-  --mount --mount-string="$HOME/projects/jupyter-k8s-min/drive:/drive"
+  --mount --mount-string="$HOME/projects/$PROFILE/drive:/drive"
 
 eval "$(minikube -p "$PROFILE" docker-env)"
