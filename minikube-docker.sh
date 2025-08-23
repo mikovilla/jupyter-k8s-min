@@ -1,4 +1,4 @@
-PROFILE=MyNotebooks
+PROFILE=jupyter-k8s-min
 MEMORY=16384
 CPUS=4
 
